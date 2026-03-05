@@ -48,7 +48,7 @@ amount (n): Value of expense
     - Choose from List for *Category*
     - Ask for 'Text' for *Description*
     - Ask for 'Number' for *Amount*
-    - Get Current Date and format it to `yyyyMMddHHmmss`
+    - Get Current Date and format it to `yyyyMMddHHmmss`. I need to change this as `HHmmss` is unnecessary.
     - Set URL to the SAM output 'ApiBaseUrl' + `/log` --> Something like `https://<api_id>.execute-api.<aws_region>.amazonaws.com/dev/log`
     - Get Contents of URL
         - Headers: `x-api-key: <your_api_key>`
