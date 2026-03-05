@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: API for personal use
+
+Parameters:
+  TableName:
+    Type: String
+    Description: Name of DynamoDB Table
+    Default: karl-expenses-table
+
+Resources:
+  # HTTP API: Mapped to api.karlmart.in
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Cors: # "'*'"
+        AllowMethods: "'GET,POST,DELETE,OPTIONS'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      EndpointConfiguration:
+        Type: REGIONAL
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: Usage plan for this API
+          Quota:
+            Limit: 15
+            Period: DAY
+          Throttle:
+            BurstLimit: 5
+            RateLimit: 2
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: "LogExpenseAPI"
+          version: "1.0"
+        paths:
+          /log:
+            post:
+              summary: "Add item to DynamoDB"
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              responses:
+                "200":
+                  description: "Successful response"
+              x-amazon-apigateway-integration:
+                type: "aws"
+                httpMethod: "POST"
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem
+                credentials:
+                  !GetAtt ApiGatewayRole.Arn
+                requestTemplates:
+                  application/json: # Using $context.requestTimeEpoch instead of $context.requestId to avoid having to create a 'date' attribute and for easier querying
+                    !Sub |
+                      {
+                        "TableName": "${ExpensesDataTable}",
+                        "Item": {
+                          "id": { "S": "$input.path('$.DAY')" },
+                          "timestamp": { "N": "$context.requestTimeEpoch" },
+                          "category": { "S": "$input.path('$.CATEGORY')" },
+                          "description": { "S": "$input.path('$.DESCRIPTION')" },
+                          "amount": { "N": "$input.path('$.AMOUNT')" }
+                        }
+                      }
+                passthroughBehavior: "when_no_match"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json:
+                        !Sub |
+                          {
+                            "message": "Expense logged!",
+                            "request": "$context"
+                          }
+
+
+# IAM Role to allow API Gateway to PUT to DynamoDB and invoke Lambda
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "DynamoDBAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "dynamodb:PutItem"
+                Resource: !GetAtt ExpensesDataTable.Arn
+
+# Table to hold expense data
+  ExpensesDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+Outputs:
+  ApiBaseUrl:
+    Description: "Base URL for the API"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
