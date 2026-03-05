@@ -16,7 +16,7 @@ I needed a quick and easy way to track my monthly spending and answer questions 
 1. Log expenses from iPhone lock screen in under 5 seconds
 2. Build a dashboard to view monthly spending, category breakdowns, insights into top vendors, and trends.
 
-**..Picture Coming Soon..**
+![Image from Grafana](ledgr.png "Legdr")
 
 
 ## Architecture
