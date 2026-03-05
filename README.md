@@ -1,6 +1,6 @@
 # Ledgr
 Lightweight serverless expense tracker.
-Requires: AWS + Grafana Cloud (Free Tier)
+Requires: iOS Shortcuts + AWS + Grafana Cloud (Free Tier)
 
 ## Why I Built This
 I needed a quick and easy way to track my monthly spending and answer questions like:
@@ -12,7 +12,9 @@ I needed a quick and easy way to track my monthly spending and answer questions 
 - *"What are my spending trends?"*
 - **"Where can I cut back on spending?"**
 
-The goal was to build a dashboard to view monthly spending, category breakdowns, insights into top vendors, and trends.
+**Goals**
+1. Log expenses from iPhone lock screen in under 5 seconds
+2. Build a dashboard to view monthly spending, category breakdowns, insights into top vendors, and trends.
 
 **..Picture Coming Soon..**
 
@@ -24,7 +26,7 @@ iOS Shortcut --> API Gateway --> DynamoDB --> Streams --> Lambda(Categorize & Su
 **Visualization Flow**
 Grafana --> Athena --> Lambda (DB Connector) --> DynamoDB
 
-#### DynamoDB Structure
+##### DynamoDB Structure
 
 ```
 id (n): YYYYMM (Primary Key)
@@ -35,6 +37,23 @@ description (s): Likely the name of the vendor
 amount (n): Value of expense
 ```
 
+#### iOS Shortcut Setup
+1. Install AWS SAM CLI
+2. Download `template.yaml`
+3. Run `sam deploy --guided` and follow the prompts (replace variable defaults)
+4. Get API Key from API Gateway Console
+5. Create iOS Shortcut
+    - List: All expense categories that are relevant
+    - Choose from List for *Category*
+    - Ask for 'Text' for *Description*
+    - Ask for 'Number' for *Amount*
+    - Get Current Date and format it to `yyyyMMddHHmmss`
+    - Set URL to the SAM output 'ApiBaseUrl' + `/log` --> Something like `https://<api_id>.execute-api.<aws_region>.amazonaws.com/dev/log`
+    - Get Contents of URL
+        - Headers: `x-api-key: <your_api_key>`
+        - Body: `DAY: <formatted_date>, CATEGORY: <select_from_variable>, DESCRIPTION: <ask_for_input>, AMOUNT: <ask_for_input>`
+    - Get 'Value' for `message` in Contents of URL
+    - Show Outpu
 
 #### Athena Setup
 
