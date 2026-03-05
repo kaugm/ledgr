@@ -20,11 +20,12 @@ I needed a quick and easy way to track my monthly spending and answer questions 
 
 
 ## Architecture
-**Logging Flow**
+**Logging Flow** 
 iOS Shortcut --> API Gateway --> DynamoDB --> Streams --> Lambda(Categorize & Sum) --> DynamoDB
 
-**Visualization Flow**
+**Visualization Flow** 
 Grafana --> Athena --> Lambda (DB Connector) --> DynamoDB
+
 
 ##### DynamoDB Structure
 
@@ -53,11 +54,10 @@ amount (n): Value of expense
         - Headers: `x-api-key: <your_api_key>`
         - Body: `DAY: <formatted_date>, CATEGORY: <select_from_variable>, DESCRIPTION: <ask_for_input>, AMOUNT: <ask_for_input>`
     - Get 'Value' for `message` in Contents of URL
-    - Show Outpu
+    - Show Output
+6. Put iOS Shortcut on lockscreen
 
-#### Athena Setup
-
-**Athena Query on DynamoDB via Athena Federated Query and DynamoDB Connector**
+#### Athena Setup: Athena Federated Query via DynamoDB Connector
 1. Deploy DynamoDB Connector
 ```
 aws serverlessrepo create-cloud-formation-change-set \
