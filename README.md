@@ -40,7 +40,8 @@ amount (n): Value of expense
 
 **Athena Query on DynamoDB via Athena Federated Query and DynamoDB Connector**
 1. Deploy DynamoDB Connector
-```aws serverlessrepo create-cloud-formation-change-set \
+```
+aws serverlessrepo create-cloud-formation-change-set \
   --application-id arn:aws:serverlessrepo:us-east-1:292517598671:applications/AthenaDynamoDBConnector \
   --stack-name athenaDynamoDBConnector \
   --capabilities CAPABILITY_RESOURCE_POLICY CAPABILITY_IAM \
@@ -48,7 +49,8 @@ amount (n): Value of expense
 ```
 
 2. Register Connector as Data Catalog in Athena
-```ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+```
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 REGION=$(aws configure get region)
 
 aws athena create-data-catalog \
@@ -59,7 +61,7 @@ aws athena create-data-catalog \
 ```
 
 3. Create Dashboard & Panels in Grafana
-How it works: Grafana --> Athena --> S3
+
 
 *For large tables queried frequently, it's often cheaper to export DynamoDB data to S3 (via DynamoDB Streams or point-in-time exports) and query from there with Athena at standard S3 rates* --> **Evaluate later to determine if this is necessary. Check Cost Explorer**
 
