@@ -25,15 +25,17 @@ iOS Shortcut --> API Gateway --> DynamoDB --> Streams --> Lambda(Categorize & Su
 Grafana --> Athena --> Lambda (DB Connector) --> DynamoDB
 
 #### DynamoDB Structure
-id (n): YYYYMM (Primary Key)
+
+```id (n): YYYYMM (Primary Key)
 timestamp (n): $context.requestTimeEpoch (Sort Key)
 ---
 category (s): Category of expense. When pulled via Lambda, please python.string.upper()
 description (s): Likely the name of the vendor
-amount (n): Value of expense
+amount (n): Value of expense```
 
 
 #### Athena Setup
+
 **Athena Query on DynamoDB via Athena Federated Query and DynamoDB Connector**
 1. Deploy DynamoDB Connector
 ```aws serverlessrepo create-cloud-formation-change-set \
