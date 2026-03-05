@@ -26,12 +26,14 @@ Grafana --> Athena --> Lambda (DB Connector) --> DynamoDB
 
 #### DynamoDB Structure
 
-```id (n): YYYYMM (Primary Key)
+```
+id (n): YYYYMM (Primary Key)
 timestamp (n): $context.requestTimeEpoch (Sort Key)
 ---
 category (s): Category of expense. When pulled via Lambda, please python.string.upper()
 description (s): Likely the name of the vendor
-amount (n): Value of expense```
+amount (n): Value of expense
+```
 
 
 #### Athena Setup
